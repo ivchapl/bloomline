@@ -3,7 +3,7 @@ import { store } from './store.js';
 import { $, esc } from './ui.js';
 import { BUILTIN, plan } from './schemes.js';
 import { grindFor, currentGrinder } from './core.js';
-import { allGrinders, settingFor, umPerStep, unitWord, BASE_UM } from './grinders.js';
+import { allGrinders, settingFor, umPerStep, unitWord, BASE_UM, REF_GRINDER_ID } from './grinders.js';
 import { fmt } from './timer.js';
 
 let root;
@@ -63,9 +63,11 @@ export function render() {
   const list = $('#cmp-list', root);
   const draw = q => {
     q = q.trim().toLowerCase();
-    const rows = allGrinders().filter(x => (q ? (x.name + ' ' + x.brand).toLowerCase().includes(q) : x.popular)).slice(0, 80);
+    const rows = allGrinders().filter(x => (q ? (x.name + ' ' + x.brand).toLowerCase().includes(q) : x.popular))
+      .sort((a, b) => (b.id === REF_GRINDER_ID) - (a.id === REF_GRINDER_ID)).slice(0, 80);
     list.innerHTML = rows.map(x => { const s = settingFor(x, BASE_UM);
-      return `<div class="cmp-row"><span>${esc(x.name)}</span><b>${esc(s.label)}</b></div>`; }).join('') || '<p class="muted">Ничего не нашлось</p>';
+      const ref = x.id === REF_GRINDER_ID ? ' <span class="tag">опорная</span>' : '';
+      return `<div class="cmp-row"><span>${esc(x.name)}${ref}</span><b>${esc(s.label)}</b></div>`; }).join('') || '<p class="muted">Ничего не нашлось</p>';
   };
   $('#cmp-q', root).oninput = e => draw(e.target.value);
   draw('');

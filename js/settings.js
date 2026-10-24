@@ -2,7 +2,7 @@
 import { t } from './i18n.js';
 import { store } from './store.js';
 import { $, $$, html, raw, esc, toast, sheet } from './ui.js';
-import { allGrinders, filterOptions, settingFor, stepsBetween, unitWord, customGrinder } from './grinders.js';
+import { allGrinders, filterOptions, settingFor, stepsBetween, unitWord, customGrinder, REF_GRINDER_ID } from './grinders.js';
 import { BUILTIN, BREWERS, brewerById, WATER, WATER_LAB_URL, readWaterLab, waterLabel } from './schemes.js';
 import { currentGrinder, calibUm, signed } from './core.js';
 
@@ -101,15 +101,17 @@ function setGrinder(id) {
 // ---------- выбор кофемолки ----------
 export function grinderListHtml(q, selectedId) {
   const all = allGrinders();
-  const item = g => `<button class="g-item${g.id === selectedId ? ' on' : ''}" data-g="${esc(g.id)}"><b>${esc(g.name)}</b>${g.source === 'bloomline' ? '<span class="tag">поправка</span>' : ''}</button>`;
+  const item = g => `<button class="g-item${g.id === selectedId ? ' on' : ''}" data-g="${esc(g.id)}"><b>${esc(g.name)}</b>${
+    g.id === REF_GRINDER_ID ? '<span class="tag">опорная</span>' : g.source === 'bloomline' ? '<span class="tag">поправка</span>' : ''}</button>`;
   q = q.trim().toLowerCase();
   if (q) {
     const hit = all.filter(g => (g.name + ' ' + g.brand).toLowerCase().includes(q));
     return hit.length ? hit.map(item).join('') : `<p class="muted">Ничего не нашлось. Выберите «${t('settings.custom')}».</p>`;
   }
-  let out = '';
+  const ref = all.find(g => g.id === REF_GRINDER_ID);
+  let out = ref ? `<h3 class="g-group">Опорная кофемолка Bloomline</h3>${item(ref)}` : '';
   for (const [k, label] of KINDS) {
-    const list = all.filter(g => g.popular && g.kind === k);
+    const list = all.filter(g => g.popular && g.kind === k && g.id !== REF_GRINDER_ID);
     out += `<h3 class="g-group">${label}</h3>${list.map(item).join('')}`;
   }
   out += `<h3 class="g-group">${t('settings.all')}</h3>${all.filter(g => !g.popular).map(item).join('')}`;
