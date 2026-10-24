@@ -3,13 +3,20 @@ import { t } from './i18n.js';
 import { store } from './store.js';
 import { $, $$, html, raw, esc, toast, sheet } from './ui.js';
 import { allGrinders, filterOptions, settingFor, stepsBetween, unitWord, customGrinder, REF_GRINDER_ID } from './grinders.js';
-import { BUILTIN, BREWERS, brewerById, WATER, WATER_LAB_URL, readWaterLab, waterLabel } from './schemes.js';
+import { BUILTIN, BREWERS, BREWER_TYPES, brewerById, WATER, WATER_LAB_URL, readWaterLab, waterLabel } from './schemes.js';
 import { currentGrinder, calibUm, signed } from './core.js';
 
 let root, onChange;
 const KINDS = [['hand', 'Ручные'], ['electric', 'Электрические'], ['budget', 'Бюджетные электрические']];
 
 export function mountSettings(el, { changed }) { root = el; onChange = changed; render(); }
+
+// Воронки по группам: конус, плоское дно, настаивание
+export function brewerChipsHtml(selected) {
+  return BREWER_TYPES.map(([type, label]) => `<h3 class="g-group">${label}</h3>
+    <div class="chips wrap">${BREWERS.filter(b => b.type === type).map(b =>
+      `<button class="chip${b.id === selected ? ' on' : ''}" data-b="${b.id}">${esc(b.name)}</button>`).join('')}</div>`).join('');
+}
 
 // База для калибровки: «Основная» при 14 г на выбранной воронке
 const calibBase = () => BUILTIN[0].grindUm + brewerById(store.get().settings.brewer).um;
@@ -46,7 +53,8 @@ export function render() {
     <section class="card set-block">
       <h2>${t('settings.brewer')}</h2>
       <p class="muted">${t('settings.brewerHint')}</p>
-      <div class="chips wrap" id="brewers">${raw(BREWERS.map(b => `<button class="chip${b.id === st.brewer ? ' on' : ''}" data-b="${b.id}">${esc(b.name)}</button>`).join(''))}</div>
+      <div id="brewers">${raw(brewerChipsHtml(st.brewer))}</div>
+      <p class="muted small">${brewerById(st.brewer).note || ''}</p>
     </section>
 
     <section class="card set-block">
@@ -70,7 +78,8 @@ export function render() {
     <section class="card set-block about">
       <h2>${t('settings.about')}</h2>
       <p>Bloomline — помол, рецепты и таймер для пуровера. Схемы рассчитаны на светлую обжарку.</p>
-      <p class="muted small">Шкала помолов: Honest Coffee Guide и конвертер Tasty Coffee, с поправками Bloomline для Timemore S3, KINGrinder K4/K6, 1Zpresso K-Ultra и Comandante X25. Значения в «мкм» условные: это общая линейка для сравнения кофемолок, а не замер частиц.</p>
+      <p>Разработчик — <b>Iggy Pour</b>.</p>
+      <p class="muted small">Шкала помолов: Honest Coffee Guide, с поправками Bloomline для Timemore S3, C5 Pro, C5 ESP Pro, KINGrinder K4/K6, 1Zpresso K-Ultra и Comandante X25. Значения в «мкм» условные: это общая линейка для сравнения кофемолок, а не замер частиц.</p>
     </section>`;
 
   $('#pick-grinder', root).onclick = () => openGrinderPicker(id => { setGrinder(id); });
@@ -181,7 +190,7 @@ export function openOnboarding(done) {
       $('#o-skip', wrap).onclick = () => { step = 3; draw(); };
     } else {
       wrap.innerHTML = `<div class="onb-inner"><h2>3 · ${t('onb.brewer')}</h2>
-        <div class="chips wrap" id="o-br">${BREWERS.map(b => `<button class="chip${b.id === st.brewer ? ' on' : ''}" data-b="${b.id}">${esc(b.name)}</button>`).join('')}</div>
+        <div id="o-br">${brewerChipsHtml(st.brewer)}</div>
         <button class="btn btn-main wide" id="o-done">${t('onb.done')}</button></div>`;
       $('#o-br', wrap).onclick = e => { const b = e.target.closest('[data-b]'); if (!b) return; store.update(s => (s.settings.brewer = b.dataset.b)); $$('#o-br .chip', wrap).forEach(c => c.classList.toggle('on', c === b)); };
       $('#o-done', wrap).onclick = () => { store.update(s => (s.settings.onboarded = true)); wrap.remove(); done(); };

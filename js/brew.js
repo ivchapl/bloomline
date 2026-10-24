@@ -6,12 +6,13 @@ import { Dial, BrewClock, cues, fmt } from './timer.js';
 import { plan, brewerById, MIN_DOSE, MAX_DOSE, waterLabel } from './schemes.js';
 import { currentScheme, allSchemes, grindFor, currentWater, signed } from './core.js';
 import { umPerStep, shiftBy, settingFor } from './grinders.js';
+import { brewerChipsHtml } from './settings.js';
 
-let root, dial, clock, P = null, phase = 'idle', drainedAt = null;
+let root, dial, clock, P = null, phase = 'idle', drainedAt = null, onChanged = () => {};
 const S = () => store.get().settings;
 
-export function mountBrew(el) {
-  root = el;
+export function mountBrew(el, { changed } = {}) {
+  root = el; if (changed) onChanged = changed;
   root.innerHTML = `
     <div class="scheme-strip" id="scheme-strip" role="tablist" aria-label="${t('schemes.title')}"></div>
     <div class="brew-grid">
@@ -55,7 +56,7 @@ export function mountBrew(el) {
           <button class="param wide" id="p-grind"><span class="k">${t('brew.grind')}</span><span class="v" id="v-grind"></span><span class="s" id="s-grind"></span></button>
           <div class="param"><span class="k">${t('brew.temp')}</span><span class="v" id="v-temp"></span><span class="s">${t('brew.tempSub')}</span></div>
           <div class="param"><span class="k">${t('brew.ratio')}</span><span class="v" id="v-ratio"></span><span class="s" id="s-ratio"></span></div>
-          <button class="param wide" id="p-brewer"><span class="k">${t('brew.brewer')}</span><span class="v small" id="v-brewer"></span></button>
+          <button class="param wide" id="p-brewer"><span class="k">${t('brew.brewer')}</span><span class="v small" id="v-brewer"></span><span class="s" id="s-brewer"></span></button>
         </div>
         <div class="steps-head"><h2>${t('brew.steps')}</h2><span class="total-chip" id="total-chip"></span></div>
         <ol class="steps" id="steps"></ol>
@@ -83,7 +84,7 @@ export function mountBrew(el) {
   $('#dose', root).onchange = e => setDose(e.target.value);
   $('#dose-chips', root).onclick = e => { const b = e.target.closest('[data-dose]'); if (b) setDose(b.dataset.dose); };
   $('#p-grind', root).onclick = openGrindSheet;
-  $('#p-brewer', root).onclick = () => (location.hash = '#settings');
+  $('#p-brewer', root).onclick = openBrewerSheet;
 
   document.addEventListener('keydown', e => {
     if (e.code === 'Space' && !/input|textarea|button|select/i.test(e.target.tagName) && !root.hidden) {
@@ -115,6 +116,7 @@ export function refresh() {
   $('#v-ratio', root).textContent = `1:${(Math.round(P.ratio * 10) / 10).toString().replace('.', ',')}`;
   $('#s-ratio', root).textContent = t('brew.ratioSub', { dose: String(dose).replace('.', ','), water: P.total });
   $('#v-brewer', root).textContent = brewerById(S().brewer).name;
+  $('#s-brewer', root).textContent = brewerById(S().brewer).note || '';
 
   const gi = grindFor(sc, dose);
   $('#v-grind', root).innerHTML = html`<span class="gname">${gi.g.name}</span> <b>${gi.set.label}</b>`;
@@ -287,7 +289,7 @@ function saveBrew({ sec, taste, rating, coffee, notes }) {
   const sc = currentScheme(), dose = S().dose, gi = grindFor(sc, dose), w = currentWater();
   const brew = {
     id: uid(), ts: Date.now(), schemeId: sc.id, schemeName: sc.name, dose, water: P.total, ratio: +P.ratio.toFixed(2),
-    temp: sc.temp, brewer: S().brewer, grinderId: gi.g.id, grinderName: gi.g.name, setting: gi.set.label, um: Math.round(gi.set.um),
+    temp: sc.temp, brewer: S().brewer, brewerName: brewerById(S().brewer).name, grinderId: gi.g.id, grinderName: gi.g.name, setting: gi.set.label, um: Math.round(gi.set.um),
     waterLabel: waterLabel(w), drawdown: sec, drawdownTarget: P.drawEnd, taste, rating, coffee, notes,
     steps: P.steps.map(s => ({ s: s.s, add: s.add, name: s.name })),
   };
@@ -329,6 +331,17 @@ function showSuggestion(brew, gi) {
     const d = sg.toUm - gi.set.um;
     store.update(s => { s.calibration[gi.g.id] = (s.calibration[gi.g.id] || 0) + d; s.journal[0].calibApplied = Math.round(d); });
     toast(t('calib.applied')); slot.innerHTML = ''; refresh();
+  };
+}
+
+// Смена воронки прямо с экрана заварки
+function openBrewerSheet() {
+  const s = sheet(t('brew.brewer'), `<div id="br-pick">${brewerChipsHtml(S().brewer)}</div>
+    <p class="muted small">${esc(t('settings.brewerHint'))}</p>`);
+  $('#br-pick', s.body).onclick = e => {
+    const b = e.target.closest('[data-b]'); if (!b) return;
+    store.update(st => (st.settings.brewer = b.dataset.b));
+    s.close(); refresh(); onChanged();
   };
 }
 

@@ -7,6 +7,8 @@ import { fmt } from './timer.js';
 
 let root, onRepeat;
 const TASTE = { sour: ['log.sour', 'bad'], ok: ['log.ok', 'good'], bitter: ['log.bitter', 'bad'] };
+// имя воронки сохраняется в записи; у ранних записей его нет — берём из списка
+const brewerName = b => b.brewerName || brewerById(b.brewer).name;
 
 export function mountJournal(el, { repeat }) { root = el; onRepeat = repeat; render(); }
 
@@ -26,7 +28,7 @@ function row(b) {
   const [tk, cls] = TASTE[b.taste] || TASTE.ok;
   return html`<button class="card brew-row" data-id="${b.id}">
     <span class="br-top"><b>${c.lot || b.schemeName}</b><span class="muted">${fmtDate(b.ts)}</span></span>
-    <span class="br-mid">${c.roaster ? c.roaster + ' · ' : ''}${b.schemeName} · ${String(b.dose).replace('.', ',')} г · ${b.grinderName} ${b.setting}</span>
+    <span class="br-mid">${c.roaster ? c.roaster + ' · ' : ''}${b.schemeName} · ${String(b.dose).replace('.', ',')} г · ${b.grinderName} ${b.setting} · ${brewerName(b)}</span>
     <span class="br-bot"><span class="pill ${cls}">${t(tk)}</span><span>сток ${fmt(b.drawdown)}</span>
       ${raw(b.rating ? `<span class="stars-ro" aria-label="Оценка ${b.rating} из 5">${'★'.repeat(b.rating)}${'☆'.repeat(5 - b.rating)}</span>` : '')}</span>
   </button>`;
@@ -37,7 +39,7 @@ function open(b) {
   const rows = [
     ['Схема', b.schemeName], ['Доза', `${String(b.dose).replace('.', ',')} г → ${b.water} г воды (1:${String(b.ratio).replace('.', ',')})`],
     ['Температура', `${b.temp} °C`], ['Помол', `${b.grinderName} · ${b.setting} (≈${b.um} мкм)`],
-    ['Воронка', brewerById(b.brewer).name], ['Вода', b.waterLabel],
+    ['Воронка', brewerName(b)], ['Вода', b.waterLabel],
     ['Сток', `${fmt(b.drawdown)} при цели ${fmt(b.drawdownTarget)}`],
     ['Кофе', [c.roaster, c.lot, c.process].filter(Boolean).join(' · ') || '—'],
     ['Дата обжарки', c.roastDate ? new Date(c.roastDate).toLocaleDateString('ru-RU') : '—'],

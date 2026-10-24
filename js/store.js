@@ -7,7 +7,7 @@ const DEFAULTS = {
     onboarded: false,
     grinderId: '1zpresso-k-ultra',
     custom: null,            // {name, filter, espresso, step}
-    brewer: 'origami-cone',
+    brewer: 'origami-air-cone',
     dose: 14,
     schemeId: 'base',
     sound: true,

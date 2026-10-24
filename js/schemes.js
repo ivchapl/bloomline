@@ -75,16 +75,31 @@ export const BUILTIN = [
   },
 ];
 
-// Поправки помола для воронок — ориентировочные стартовые значения, калибровка их уточняет
+// Воронки. um — поправка помола: ориентировочная стартовая, калибровка её уточняет.
+// Все конусы 60° считаются как V60 (0); материал на помол не влияет, только на прогрев — это в подсказке.
+const HEAT = {
+  plastic: 'Пластик почти не забирает тепло: прогрев не нужен, достаточно пролить фильтр',
+  porcelain: 'Фарфор забирает тепло: прогрейте воронку кипятком 20–30 с, иначе чашка выйдет как на 2 °C холоднее',
+  glass: 'Стекло греется быстрее фарфора: хватит короткого прогрева 10–15 с',
+};
+export const BREWER_TYPES = [['cone', 'Конус'], ['flat', 'Плоское дно'], ['immersion', 'Настаивание']];
 export const BREWERS = [
-  { id: 'origami-cone', name: 'Origami + конусный фильтр', um: 0 },
-  { id: 'origami-wave', name: 'Origami + волновой фильтр', um: -15 },
-  { id: 'v60', name: 'Hario V60', um: 0 },
-  { id: 'kalita', name: 'Kalita Wave', um: -15 },
-  { id: 'orea', name: 'Orea', um: -15 },
-  { id: 'april', name: 'April', um: -15 },
-  { id: 'switch', name: 'Hario Switch', um: 60 },
-  { id: 'clever', name: 'Clever Dripper', um: 60 },
+  { id: 'origami-air-cone', type: 'cone', name: 'Origami Air S/M + конусный фильтр', um: 0, note: HEAT.plastic },
+  { id: 'origami-cone', type: 'cone', name: 'Origami фарфор + конусный фильтр', um: 0, note: HEAT.porcelain },
+  { id: 'v60', type: 'cone', name: 'Hario V60 02 · пластик', um: 0, note: HEAT.plastic },
+  { id: 'v60-ceramic', type: 'cone', name: 'Hario V60 02 · фарфор', um: 0, note: HEAT.porcelain },
+  { id: 'v60-glass', type: 'cone', name: 'Hario V60 02 · стекло', um: 0, note: HEAT.glass },
+  // конус 60° с десятью рёбрами-лепестками, фильтры как у V60
+  { id: 'cafec-flower', type: 'cone', name: 'Cafec Flower', um: 0, note: 'Конус 60° с рёбрами-лепестками: зазор у фильтра, поток ровный, как у V60, фильтры конусные. Фарфоровую версию прогрейте' },
+  // конус 27° вместо 60°, тритан, на одну чашку, свои фильтры (shop.tastycoffee.ru/accessories/purover-cafec-deep-27-black)
+  { id: 'cafec-deep27', type: 'cone', name: 'Cafec Deep 27 · тритан', um: 0, note: 'Конус 27° вместо обычных 60°: слой кофе выше, сток медленнее, чашка слаще и плотнее. Нужны свои фильтры Deep 27, объём на одну чашку. Тритан тепло почти не забирает. Если финиш затягивается — мелите чуть крупнее' },
+  { id: 'origami-air-wave', type: 'flat', name: 'Origami Air S/M + волновой фильтр', um: -15, note: HEAT.plastic },
+  { id: 'origami-wave', type: 'flat', name: 'Origami фарфор + волновой фильтр', um: -15, note: HEAT.porcelain },
+  { id: 'kalita', type: 'flat', name: 'Kalita Wave', um: -15, note: 'Плоское дно и три отверстия: лейте в центр, поток сдерживает сама воронка' },
+  { id: 'orea', type: 'flat', name: 'Orea', um: -15, note: 'Плоское дно и быстрый сток: лейте в центр небольшими порциями' },
+  { id: 'april', type: 'flat', name: 'April', um: -15, note: 'Плоское дно и быстрый сток: лейте в центр небольшими порциями' },
+  { id: 'switch', type: 'immersion', name: 'Hario Switch', um: 60, note: 'Настаивание: схемы с проливами здесь условны' },
+  { id: 'clever', type: 'immersion', name: 'Clever Dripper', um: 60, note: 'Настаивание: схемы с проливами здесь условны' },
 ];
 export const brewerById = id => BREWERS.find(b => b.id === id) || BREWERS[0];
 

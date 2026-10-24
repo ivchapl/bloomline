@@ -3,7 +3,7 @@ import { t } from './i18n.js';
 import { store } from './store.js';
 import { $, $$, toast } from './ui.js';
 import { loadGrinders } from './grinders.js';
-import { decodeScheme, waterLabel } from './schemes.js';
+import { decodeScheme, waterLabel, BREWERS } from './schemes.js';
 import { schemeById, currentWater } from './core.js';
 import { mountBrew, refresh as refreshBrew } from './brew.js';
 import { mountSchemes, render as renderSchemes, offerImport } from './schemes-view.js';
@@ -51,7 +51,7 @@ async function main() {
   try { await loadGrinders(); }
   catch (e) { $('#app-error').hidden = false; return; }
 
-  mountBrew($('#view-brew'));
+  mountBrew($('#view-brew'), { changed: () => { renderSchemes(); renderGuide(); } });
   mountSchemes($('#view-schemes'), {
     use: id => { store.update(s => (s.settings.schemeId = id)); refreshBrew(); location.hash = '#brew'; },
     changed: refreshBrew,
@@ -61,6 +61,7 @@ async function main() {
       store.update(s => {
         if (schemeById(b.schemeId).id === b.schemeId) s.settings.schemeId = b.schemeId;
         s.settings.dose = b.dose;
+        if (BREWERS.some(x => x.id === b.brewer)) s.settings.brewer = b.brewer;
         if (b.coffee) s.lastCoffee = b.coffee;
       });
       refreshBrew(); location.hash = '#brew';
