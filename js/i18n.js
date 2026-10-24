@@ -64,7 +64,7 @@ const RU = {
   'settings.custom': 'Своя кофемолка', 'settings.customHint': 'Если вашей модели нет в списке: задайте две точки на её шкале.',
   'settings.customName': 'Название', 'settings.customFilter': 'Деление для фильтра (ваш рабочий помол)',
   'settings.customEspresso': 'Деление для эспрессо', 'settings.customSave': 'Сохранить свою кофемолку',
-  'settings.calibration': 'Калибровка', 'settings.calibHint': 'Укажите деление, на котором у вас получается «Мытая мягкая» при 14 г. Bloomline пересчитает все схемы под вашу кофемолку.',
+  'settings.calibration': 'Калибровка', 'settings.calibHint': 'Укажите деление, на котором у вас получается «Основная» схема при 14 г. Bloomline пересчитает все схемы под вашу кофемолку.',
   'settings.calibNow': 'Сейчас: {v}', 'settings.calibNone': 'без поправки', 'settings.calibSet': 'Задать', 'settings.calibReset': 'Сбросить',
   'settings.brewer': 'Воронка', 'settings.brewerHint': 'Поправка помола для воронки ориентировочная, калибровка её уточнит.',
   'settings.water': 'Вода', 'settings.waterLab': 'Из Water Lab: {name}', 'settings.waterLabMissing': 'Water Lab на этом устройстве ещё не открывали',

@@ -11,8 +11,8 @@ const KINDS = [['hand', 'Ручные'], ['electric', 'Электрически�
 
 export function mountSettings(el, { changed }) { root = el; onChange = changed; render(); }
 
-// База для калибровки: «Мытая мягкая» при 14 г на выбранной воронке
-const calibBase = () => BUILTIN[1].grindUm + brewerById(store.get().settings.brewer).um;
+// База для калибровки: «Основная» при 14 г на выбранной воронке
+const calibBase = () => BUILTIN[0].grindUm + brewerById(store.get().settings.brewer).um;
 
 export function render() {
   if (!root) return;

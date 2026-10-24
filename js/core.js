@@ -9,7 +9,7 @@ export const currentGrinder = () => {
 };
 
 export const allSchemes = () => [...store.get().schemes, ...BUILTIN];
-export const schemeById = id => allSchemes().find(x => x.id === id) || BUILTIN[1];
+export const schemeById = id => allSchemes().find(x => x.id === id) || BUILTIN[0];
 export const currentScheme = () => schemeById(store.get().settings.schemeId);
 
 export const calibUm = (g = currentGrinder()) => store.get().calibration[g.id] || 0;

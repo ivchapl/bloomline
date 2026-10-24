@@ -54,7 +54,7 @@ export function render() {
     if (b.dataset.act === 'del' && await confirmSheet(t('schemes.confirmDelete', { name: x.name }), t('schemes.delete'))) {
       store.update(s => {
         s.schemes = s.schemes.filter(y => y.id !== id);
-        if (s.settings.schemeId === id) s.settings.schemeId = 'wsoft';
+        if (s.settings.schemeId === id) s.settings.schemeId = 'base';
       });
       toast(t('schemes.deleted')); render(); onChanged();
     }
@@ -82,8 +82,8 @@ function openEditor(src) {
   // помол в редакторе показываем таким, каким его молоть: с калибровкой и поправкой воронки, при 14 г
   const off = calibUm(g) + brewerById(store.get().settings.brewer).um;
   const ed = src ? structuredClone(src) : {
-    id: null, name: 'Моя схема', icon: '☕', ratio: 16, temp: 93, grindUm: BUILTIN[1].grindUm, drawdown: 40,
-    mode: 'params', params: { ...DEFAULT_PARAMS },
+    id: null, name: 'Моя схема', icon: '☕', ratio: 16.5, temp: 93, grindUm: BUILTIN[0].grindUm, drawdown: 30,
+    mode: 'params', params: { ...DEFAULT_PARAMS, shares: [...DEFAULT_PARAMS.shares] },
   };
   ed.params = ed.params || { ...DEFAULT_PARAMS };
   ed.mode = ed.mode || 'steps';
@@ -122,7 +122,7 @@ function openEditor(src) {
       </div>
       ${ed.mode === 'params' ? `
         <div class="form-grid">
-          ${num('ed-bx', t('editor.bloomWater'), ed.params.bloomX, 1, 6, 0.5)}
+          ${num('ed-bx', t('editor.bloomWater'), ed.params.bloomX, 1, 6, 0.1)}
           ${num('ed-bt', t('editor.bloomTime'), ed.params.bloomTime, 10, 90, 5)}
           ${num('ed-pulses', t('editor.pulses'), ed.params.pulses, 1, 8, 1)}
           ${num('ed-int', t('editor.interval'), ed.params.interval, 10, 90, 5)}

@@ -7,6 +7,19 @@ import { BASE_UM } from './grinders.js';
 const K = 7.6; // мкм на щелчок K-Ultra по шкале HCG
 export const BUILTIN = [
   {
+    // Рабочая схема автора на 14 г: блуминг и три пролива. Два пролива дают пустоватую чашку, четыре — тяжёлую.
+    // На ней найден оптимум помола: K-Ultra 0.6.8–0.7.5, Timemore S3 5.5–6.0.
+    id: 'base', builtin: true, name: 'Основная', icon: '⭐',
+    about: 'Блуминг и три пролива. Стартовая схема: с неё начинайте незнакомый лот.',
+    temp: 93, ratio: 230 / 14, grindUm: BASE_UM, pourEnd: 130, drawdown: 40,
+    steps: [
+      { at: 0, frac: 45 / 230, name: 'Блуминг', hint: 'Смочите всю поверхность кофе и дайте таблетке раскрыться' },
+      { at: 35, frac: 60 / 230, name: 'Пролив 1', hint: 'Спиралью из центра, в конце вращение Рао' },
+      { at: 70, frac: 60 / 230, name: 'Пролив 2', hint: 'Спокойной спиралью, без вращения' },
+      { at: 105, frac: 65 / 230, name: 'Пролив 3', hint: 'Последний пролив, затем вращение Рао или лёгкая вибрация — ровное плоское дно' },
+    ],
+  },
+  {
     id: 'wdense', builtin: true, name: 'Мытая плотная', icon: '💧',
     about: 'Кения, мытая Эфиопия. Плотное высокогорное зерно не боится жара.',
     temp: 95, ratio: 16, grindUm: 70 * K, pourEnd: 120, drawdown: 40,
@@ -104,7 +117,8 @@ export function readWaterLab() {
 export const waterLabel = w => `${w.name} · GH ${+w.gh.toFixed(1)} · KH ${+w.kh.toFixed(1)}`;
 
 // --- редактор: схема по параметрам (как у Fellow Aiden) ---
-export const DEFAULT_PARAMS = { bloomX: 3, bloomTime: 35, pulses: 3, interval: 30, dist: 'equal', shares: [] };
+// Новая схема по умолчанию повторяет «Основную»: блуминг ×3,2 дозы и три пролива через 35 с
+export const DEFAULT_PARAMS = { bloomX: 3.2, bloomTime: 35, pulses: 3, interval: 35, dist: 'custom', shares: [60, 60, 65] };
 
 export function stepsFromParams(ratio, p) {
   const bloomFrac = Math.min(0.6, p.bloomX / ratio);

@@ -9,7 +9,7 @@ const DEFAULTS = {
     custom: null,            // {name, filter, espresso, step}
     brewer: 'origami-cone',
     dose: 14,
-    schemeId: 'wsoft',
+    schemeId: 'base',
     sound: true,
     waterPreset: 'melb',
   },
