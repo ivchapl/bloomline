@@ -7,6 +7,7 @@
 
 Все значения в общей условной шкале HCG «мкм». Поправки согласованы 24.10.2026
 (см. «Атлас помолов»): Timemore S3, KINGrinder K4/K6, K-Ultra после 1.0.0, Comandante X25.
+Позже добавлены шкалы Timemore C5 Pro и C5 ESP Pro (по ходу жернова, как у S3).
 
 Запуск: python3 tools/build_grinders.py
 """
@@ -47,6 +48,7 @@ POPULAR = {
  '1Zpresso Q2 (Heptagonal burrs)': ('1Zpresso Q2 / Q Air', 'hand'),
  'Timemore C2': ('Timemore C2 / C2 Max / Fold', 'hand'), 'Timemore C3': ('Timemore C3 / C3S / C3 Pro / Max', 'hand'),
  'Timemore C3 ESP Pro': ('Timemore C3 ESP / ESP Pro', 'hand'), 'Timemore C5 Pro': ('Timemore C5 Pro', 'hand'),
+ 'Timemore C5 ESP Pro': ('Timemore C5 ESP Pro', 'hand'),
  'Timemore S3': ('Timemore Chestnut S3', 'hand'), 'Timemore Chestnut X': ('Timemore Chestnut X', 'hand'),
  'Timemore Nano': ('Timemore Nano', 'hand'), 'KINGrinder K6': ('KINGrinder K6', 'hand'),
  'KINGrinder K4': ('KINGrinder K4', 'hand'), 'KINGrinder K2': ('KINGrinder K2', 'hand'),
@@ -85,6 +87,13 @@ OVERRIDE = {
  'KINGrinder K4': dict(type='linear', fmt='rc', base=60, step=1, um0=0, umPerUnit=6.5, min=0, max=240, unit='click'),
  # таблица HCG/Tasty кончается на 1.0.0 — продлеваем тем же шагом до 2.0.0
  '1Zpresso K-Ultra': dict(type='linear', fmt='rnt', base=100, step=1, um0=0, umPerUnit=7.6, min=0, max=200, unit='click'),
+ # Timemore C5 (жернова S2C 42 мм, ноль — касание жерновов, по данным timemore.com/C5series).
+ # Шкала построена как у S3: «мкм» HCG ≈ 187,5 + 0,38 × ход жернова. HCG даёт C5 Pro 19,8 мкм/щелчок —
+ # завышено так же, как было у S3. Сверка: старт «Основной» = 10, у Slow Pour Supply пуровер 10–14, френч-пресс 14–17.
+ # C5 Pro: 16 цифр × 3 щелчка = 48 на оборот, 31 мкм хода на щелчок; запись «10», «10.1», «10.2»
+ 'Timemore C5 Pro': dict(type='linear', fmt='nt', per=3, step=1, um0=187.5, umPerUnit=11.8, min=3, max=48, unit='click'),
+ # C5 ESP Pro: 10 цифр × 5 рисок = 50 на оборот, 3 оборота, 15 мкм хода; запись «оборот.цифра.риска»
+ 'Timemore C5 ESP Pro': dict(type='linear', fmt='rnt', base=50, per=5, step=1, um0=187.5, umPerUnit=5.7, min=4, max=150, unit='click'),
 }
 
 def decimals(s):

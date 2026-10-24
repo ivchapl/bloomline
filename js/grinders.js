@@ -47,9 +47,13 @@ function linearLabel(sc, v) {
     const c = Math.round(v);
     return { label: `${Math.floor(c / sc.base)}.${pad2(c % sc.base)}`, sub: `${c} ${WORDS.click(c)}` };
   }
-  if (sc.fmt === 'rnt') {
-    const c = Math.round(v), r = Math.floor(c / sc.base), rest = c % sc.base;
-    return { label: `${r}.${Math.floor(rest / 10)}.${rest % 10}`, sub: `${c} ${WORDS.click(c)}` };
+  if (sc.fmt === 'rnt') {   // оборот.цифра.риска: K-Ultra (10 рисок на цифру), C5 ESP Pro (5)
+    const per = sc.per || 10, c = Math.round(v), r = Math.floor(c / sc.base), rest = c % sc.base;
+    return { label: `${r}.${Math.floor(rest / per)}.${rest % per}`, sub: `${c} ${WORDS.click(c)}` };
+  }
+  if (sc.fmt === 'nt') {    // цифра.щелчок: C5 Pro — 3 щелчка на цифру, «10», «10.1», «10.2»
+    const c = Math.round(v), n = Math.floor(c / sc.per), k = c % sc.per;
+    return { label: k ? `${n}.${k}` : `${n}`, sub: `${c} ${WORDS.click(c)}` };
   }
   return { label: v.toFixed(decimalsOf(sc.step)), sub: '' };
 }

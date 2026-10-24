@@ -1,6 +1,6 @@
 // Офлайн-режим: оболочка приложения в кэше, страница — сначала из сети, шрифты — из кэша с фоновым обновлением.
 // При изменении файлов приложения поднимайте VERSION, иначе у пользователей останется старый кэш.
-const VERSION = 'bloomline-2026-10-24-3';
+const VERSION = 'bloomline-2026-10-24-4';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/i18n.js', 'js/store.js', 'js/grinders.js', 'js/schemes.js', 'js/core.js', 'js/ui.js',
