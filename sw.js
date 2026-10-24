@@ -1,6 +1,6 @@
 // Офлайн-режим: оболочка приложения в кэше, страница — сначала из сети, шрифты — из кэша с фоновым обновлением.
 // При изменении файлов приложения поднимайте VERSION, иначе у пользователей останется старый кэш.
-const VERSION = 'bloomline-2026-10-24-4';
+const VERSION = 'bloomline-2026-10-24-5';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/i18n.js', 'js/store.js', 'js/grinders.js', 'js/schemes.js', 'js/core.js', 'js/ui.js',
@@ -10,7 +10,10 @@ const SHELL = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache: 'reload' — мимо HTTP-кэша браузера: GitHub Pages разрешает хранить файлы 10 минут,
+  // и без этого в новую версию попадала смесь старых и новых модулей
+  const fresh = SHELL.map(u => new Request(u, { cache: 'reload' }));
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(fresh)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -36,7 +39,7 @@ self.addEventListener('fetch', e => {
   if (url.origin === location.origin || isFont) {
     e.respondWith(caches.open(VERSION).then(async c => {
       const hit = await c.match(req);
-      const net = fetch(req).then(res => { if (res.ok || res.type === 'opaque') c.put(req, res.clone()); return res; }).catch(() => hit);
+      const net = fetch(req, { cache: 'no-cache' }).then(res => { if (res.ok || res.type === 'opaque') c.put(req, res.clone()); return res; }).catch(() => hit);
       return hit || net;
     }));
   }
