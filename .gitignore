@@ -1,0 +1,6 @@
+.DS_Store
+.claude/
+# исходные выгрузки HCG и Tasty Coffee — только для пересборки data/grinders.json, в репозиторий не кладём
+tools/src/
+assets/icon-preview.png
+assets/icon-source-v1.jpg
